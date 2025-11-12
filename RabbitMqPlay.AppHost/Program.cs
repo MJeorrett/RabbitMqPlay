@@ -7,6 +7,7 @@ builder.AddProject<Projects.RabbitMqPlay_PublisherApi>("rabbitmqplay-publisherap
     .WithReference(rabbitMq);
 
 builder.AddProject<Projects.RabbitMqPlay_Consumer>("consumer")
-    .WithReference(rabbitMq);
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq);
 
 builder.Build().Run();
