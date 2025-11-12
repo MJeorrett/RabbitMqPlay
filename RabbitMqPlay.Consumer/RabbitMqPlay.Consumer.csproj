@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RabbitMQ.Client" Version="7.2.0" />
+    <PackageReference Include="Aspire.RabbitMQ.Client" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RabbitMqPlay.ServiceDefaults\RabbitMqPlay.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,29 +1,63 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Text;
 
-var factory = new ConnectionFactory() { HostName = "localhost" };
-using var connection = await factory.CreateConnectionAsync();
-using var channel = await connection.CreateChannelAsync();
+var builder = Host.CreateApplicationBuilder(args);
 
-await channel.QueueDeclareAsync(queue: "hello",
-                                durable: false,
-                                exclusive: false,
-                                autoDelete: false,
-                                arguments: null);
+builder.AddServiceDefaults();
+builder.AddRabbitMQClient("rabbitmq");
 
-Console.WriteLine(" [*] Waiting for messages.");
+builder.Services.AddHostedService<RabbitMqConsumer>();
 
-var consumer = new AsyncEventingBasicConsumer(channel);
+var host = builder.Build();
+host.Run();
 
-consumer.ReceivedAsync += (model, ea) =>
+public class RabbitMqConsumer : IHostedService
 {
-    var body = ea.Body.ToArray();
-    var message = System.Text.Encoding.UTF8.GetString(body);
-    Console.WriteLine(" [x] Received {0}", message);
-    return Task.CompletedTask;
-};
+    private readonly IConnection _rabbitConnection;
+    private readonly ILogger<RabbitMqConsumer> _logger;
+    private IModel? _channel;
 
-await channel.BasicConsumeAsync(queue: "hello", autoAck: true, consumer);
+    public RabbitMqConsumer(IConnection rabbitConnection, ILogger<RabbitMqConsumer> logger)
+    {
+        _rabbitConnection = rabbitConnection;
+        _logger = logger;
+    }
 
-Console.WriteLine("Press [enter] to exit.");
-Console.ReadLine();
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _channel = _rabbitConnection.CreateModel();
+
+        const string queueName = "hello";
+        _channel.QueueDeclare(queue: queueName,
+                             durable: false,
+                             exclusive: false,
+                             autoDelete: false,
+                             arguments: null);
+
+        _logger.LogInformation("[*] Waiting for messages.");
+
+        var consumer = new EventingBasicConsumer(_channel);
+        consumer.Received += (model, ea) =>
+        {
+            var body = ea.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+            _logger.LogInformation("[x] Received {Message}", message);
+        };
+
+        _channel.BasicConsume(queue: queueName,
+                             autoAck: true,
+                             consumer: consumer);
+
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _channel?.Close();
+        return Task.CompletedTask;
+    }
+}

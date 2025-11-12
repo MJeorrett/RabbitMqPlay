@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RabbitMqPlay.Consumer\RabbitMqPlay.Consumer.csproj" />
     <ProjectReference Include="..\RabbitMqPlay.PublisherApi\RabbitMqPlay.PublisherApi.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-@RabbitMqPlay.PublisherApi_HostAddress = http://localhost:5115
+@RabbitMqPlay.PublisherApi_HostAddress = https://localhost:7059
 
 POST {{RabbitMqPlay.PublisherApi_HostAddress}}/publish
 Content-Type: application/json

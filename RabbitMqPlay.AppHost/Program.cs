@@ -1,12 +1,12 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var username = builder.AddParameter("username", secret: true);
-var password = builder.AddParameter("password", secret: true);
-
-var rabbitMq = builder.AddRabbitMQ("rabbitmq", username, password)
+var rabbitMq = builder.AddRabbitMQ("rabbitmq")
     .WithManagementPlugin();
 
 builder.AddProject<Projects.RabbitMqPlay_PublisherApi>("rabbitmqplay-publisherapi")
+    .WithReference(rabbitMq);
+
+builder.AddProject<Projects.RabbitMqPlay_Consumer>("consumer")
     .WithReference(rabbitMq);
 
 builder.Build().Run();
