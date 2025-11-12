@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="RabbitMqPlay.AppHost/RabbitMqPlay.AppHost.csproj" />
+  <Project Path="RabbitMqPlay.Consumer/RabbitMqPlay.Consumer.csproj" />
+  <Project Path="RabbitMqPlay.PublisherApi/RabbitMqPlay.PublisherApi.csproj" />
+  <Project Path="RabbitMqPlay.ServiceDefaults/RabbitMqPlay.ServiceDefaults.csproj" />
+</Solution>
